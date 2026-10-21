@@ -1,0 +1,177 @@
+<!doctype html><html lang="en" data-t="dark"><head><meta charset="utf-8"><title>Mindscape</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>
+:root{--bg:#0a0c13;--fg:#e4e8f6;--mut:#7f89aa;--pn:#141929ee;--bd:#ffffff18;--gr:#ffffff16;--ln:#7f89ad;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-t=light]{--bg:#f2f3f9;--fg:#1a2036;--mut:#68718f;--pn:#fffffff0;--bd:#00000018;--gr:#0000001c;--ln:#8791b3}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--fg);font:14px/1.4 "Avenir Next",Optima,Candara,system-ui,sans-serif}
+#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;background-image:radial-gradient(var(--gr) 1.2px,transparent 1.2px)}
+#cv text{pointer-events:none;font-size:13px;fill:var(--fg)}#cv .el{font-size:12px;fill:var(--mut);paint-order:stroke;stroke:var(--bg);stroke-width:4px}#cv .sm{font-size:11px;fill:var(--mut)}
+.pn{position:fixed;background:var(--pn);border:1px solid var(--bd);border-radius:14px;backdrop-filter:blur(12px);padding:8px;z-index:5}
+#top{top:calc(10px + env(safe-area-inset-top,0px));left:10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 20px)}
+#crumb{padding:0 6px;white-space:nowrap;overflow-x:auto;color:var(--mut)}#crumb a:last-child{color:var(--fg)}
+a[data-a]{cursor:pointer}a[data-a]:hover{text-decoration:underline}#crumb a{padding:2px 6px;border-radius:6px;display:inline-block}.dz{background:#7c9cff55;outline:2px solid #7c9cff}input[type=range]{padding:0;margin:0 0 6px}input[type=checkbox]{width:auto;margin:0}input[type=color]{width:34px;height:24px;padding:0;margin:0}.lb{display:flex;justify-content:space-between;color:var(--mut);font-size:12px}.ck{display:flex;gap:8px;align-items:center;margin:2px 0 8px}label.fb{flex:1;text-align:center;background:#ffffff0f;border:1px solid var(--bd);border-radius:9px;padding:4px 9px;cursor:pointer}label.fb:hover{background:#7c9cff33}
+button{font:inherit;color:var(--fg);background:#ffffff0f;border:1px solid var(--bd);border-radius:9px;padding:4px 9px;cursor:pointer}button:hover{background:#7c9cff33}
+input,textarea{width:100%;font:inherit;color:var(--fg);background:#ffffff0d;border:1px solid var(--bd);border-radius:9px;padding:6px 8px;margin-bottom:6px;resize:vertical;outline:none}input:focus,textarea:focus{border-color:#7c9cff}
+#side{top:calc(64px + env(safe-area-inset-top,0px));right:10px;width:250px;max-height:calc(100% - 150px);overflow:auto}
+#bar{bottom:calc(14px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 380px))}#bar input{margin:0}
+#mm{position:fixed;left:10px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:160px;height:110px;z-index:5;padding:0}
+.r{display:flex;gap:6px;margin-bottom:6px}.r button{flex:1}.sw{display:flex;gap:7px;margin:2px 0 8px}.sw i{width:20px;height:20px;border-radius:50%;cursor:pointer}
+.m{color:var(--mut);margin:0 0 6px;font-size:12px}
+.ov{position:fixed;inset:0;z-index:9;background:#0007;display:flex;justify-content:center;align-items:flex-start;padding-top:12vh}.ov .pn{position:static;width:min(560px,92%)}
+.it{padding:6px 8px;border-radius:8px;cursor:pointer}.it:hover{background:#7c9cff26}.it small{display:block;color:var(--mut)}
+#tt{position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:12;max-width:90%;text-align:center}
+#hint{position:fixed;inset:0;display:grid;place-items:center;color:var(--mut);pointer-events:none;text-align:center}
+@media(max-width:760px){#mm{display:none}#bar{width:calc(100% - 20px)}#side{width:210px}}
+</style></head><body>
+<svg id="cv"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8791b3"/></marker></defs><g id="g"></g></svg>
+<div id="hint">Double-click anywhere to drop a thought.<br>Or type below and press Enter.</div>
+<div id="top" class="pn"><span id="crumb"></span><button data-a="search" title="Search all maps (Ctrl+K)">Search</button><button data-a="rand" title="Random thought (R)">Random</button><button data-a="wrapall" title="Add a layer above: wraps everything in this map inside a new parent bubble (L)">Layer above</button><button data-a="focus" title="Focus mode (F)">Focus</button><button data-a="theme" title="Theme (T)">Theme</button><button data-a="undo" title="Undo (Ctrl+Z)">Undo</button><button data-a="redo" title="Redo (Ctrl+Shift+Z)">Redo</button><button data-a="data" title="Export / import JSON">Data</button></div>
+<div id="side" class="pn" hidden></div>
+<div id="bar" class="pn"><input id="qa" placeholder="Capture a thought… Enter = new bubble · Shift+Enter = linked to selection" autocomplete="off"></div>
+<canvas id="mm" class="pn" width="160" height="110"></canvas><div id="tt" class="pn" hidden></div>
+<div id="sr" class="ov" hidden><div class="pn"><input id="sq" placeholder="Search every bubble in every map…" autocomplete="off"><div id="sl" style="max-height:50vh;overflow:auto"></div></div></div>
+<div id="ne" class="ov" hidden><div class="pn"><p class="m" id="nt"></p><textarea id="nb" rows="14" placeholder="Write as much as you want…"></textarea><div class="r"><span class="m" id="nc" style="flex:1;margin:0"></span><button data-a="closeN">Done</button></div></div></div><div id="dt" class="ov" hidden><div class="pn"><p class="m">Your maps live in this browser. To move them to another device, save a file here, then on the other device choose Open file and Merge (adds to what is there) or Replace (keeps your previous data as a backup).</p><div class="r"><button data-a="savef">Save to file</button><label class="fb">Open file<input type="file" id="fi" accept=".json,application/json" hidden></label></div><textarea id="dj" rows="12"></textarea><div class="r"><button data-a="copy">Copy</button><button data-a="merge">Merge into my maps</button><button data-a="load">Replace my maps</button></div><div class="r"><button data-a="closeD">Close</button></div></div></div>
+<script>
+const K='mindscape.v1',PAL=['#7c9cff','#5eead4','#f59e8b','#c084fc','#fbbf24','#86efac','#f472b6','#94a3b8'],$=i=>document.getElementById(i),cv=$('cv'),g=$('g'),mm=$('mm');
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-3);
+const esc=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fresh=()=>({nodes:{},edges:{},maps:{},cur:'root',theme:'dark',focus:0});
+const fix=o=>{o.maps=o.maps||{};if(o.cur!=='root'&&!o.nodes[o.cur])o.cur='root';return o};
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+S=S&&S.nodes&&S.edges?fix(S):fresh();
+let H=[],R=[],pend=null,drag=null,last={t:0,id:null,x:0,y:0},st,tt,hot=null,mvId=null;
+const map=()=>S.maps[S.cur]||(S.maps[S.cur]={cam:{x:innerWidth/2,y:innerHeight/2,k:1}}),cam=()=>map().cam,here=()=>Object.values(S.nodes).filter(n=>n.map===S.cur);
+const selN=()=>{const s=map().sel;return s&&s.t=='n'&&S.nodes[s.id]||null},selE=()=>{const s=map().sel,e=s&&s.t=='e'&&S.edges[s.id];return e&&S.nodes[e.from]&&S.nodes[e.to]?e:null};
+const wc=s=>(s.trim()?s.trim().split(/\s+/).length:0)+' words · '+s.length+' characters',nm=n=>esc(n.text||'untitled'),pathOf=id=>{const p=[];while(id!=='root'&&S.nodes[id]){p.unshift(id);id=S.nodes[id].map}return p};
+function save(){clearTimeout(st);st=setTimeout(flush,300)}
+function flush(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast('Autosave failed. Copy your data from Data to back it up.',5000)}}
+onpagehide=flush;
+function toast(m,ms){const t=$('tt');t.textContent=m;t.hidden=!m;clearTimeout(tt);if(m&&ms)tt=setTimeout(()=>t.hidden=true,ms)}
+const snap=()=>JSON.stringify([S.nodes,S.edges]);
+function commit(){const s=snap();if(H[H.length-1]!==s){H.push(s);if(H.length>100)H.shift()}R=[]}
+function rest(s){[S.nodes,S.edges]=JSON.parse(s);if(S.cur!=='root'&&!S.nodes[S.cur])S.cur='root';pend=null;refresh();save()}
+const undo=()=>{if(H.length){R.push(snap());rest(H.pop())}},redo=()=>{if(R.length){H.push(snap());rest(R.pop())}};
+function mk(text,x,y,color){const n={id:uid(),map:S.cur,text,note:'',tags:'',x,y,r:46,color:color||PAL[Object.keys(S.nodes).length%PAL.length]};S.nodes[n.id]=n;return n}
+function link(a,b,q){if(a===b)return null;let e=Object.values(S.edges).find(x=>x.from===a&&x.to===b);if(!e){if(!q)commit();e={id:uid(),from:a,to:b,label:''};S.edges[e.id]=e}return e}
+function child(p,t){const a=Math.random()*6.28,n=mk(t,p.x+Math.cos(a)*(p.r+110),p.y+Math.sin(a)*(p.r+110),p.color);link(p.id,n.id,1);return n}
+function rm(id){for(const k of Object.values(S.nodes).filter(n=>n.map===id))rm(k.id);delete S.nodes[id];delete S.maps[id];for(const e of Object.values(S.edges))if(e.from===id||e.to===id)delete S.edges[e.id]}
+function moveNode(id,tg,q){const n=S.nodes[id];if(!n||n.map===tg||pathOf(tg).includes(id))return;if(!q)commit();
+ const from=n.map,path=pathOf(from),i=path.indexOf(tg),up=i>=0||tg==='root';let x,y;
+ if(up){const b=S.nodes[path[i+1]],a=Math.random()*6.28,d=b.r+n.r+30;x=b.x+Math.cos(a)*d;y=b.y+Math.sin(a)*d}
+ else{const L=Object.values(S.nodes).filter(m=>m.map===tg);let cx=0,cy=0;L.forEach(m=>{cx+=m.x;cy+=m.y});if(L.length){cx/=L.length;cy/=L.length}x=cx+(Math.random()-.5)*200;y=cy+(Math.random()-.5)*200}
+ n.map=tg;n.x=x;n.y=y;const M=S.maps[from];if(M&&M.sel&&M.sel.id===id)M.sel=null;
+ toast(`Moved “${n.text||'untitled'}” ${up?'up to':'into'} ${tg==='root'?'Home':S.nodes[tg].text||'untitled'}. Ctrl+Z undoes it. Links to bubbles left behind are now cross-map links.`,5000);refresh();save()}
+function wrapNodes(list){if(!list.length){toast('Nothing in this map to wrap yet.',2000);return}commit();
+ const all=list.length===here().length,c=cam();let x=0,y=0;list.forEach(n=>{x+=n.x;y+=n.y});x/=list.length;y/=list.length;
+ const w=mk('',x,y,'#c084fc');w.r=62;const old=S.maps[S.cur];list.forEach(n=>n.map=w.id);
+ S.maps[w.id]=all?old:{cam:{x:innerWidth/2-x*c.k,y:innerHeight/2-y*c.k,k:c.k}};
+ if(all)S.maps[S.cur]={cam:{x:innerWidth/2-x,y:innerHeight/2-y,k:1}};
+ toast('New layer created. Name it, then open it to see what is inside.',3500);select({t:'n',id:w.id},1)}
+function dropCheck(e,n){document.querySelectorAll('#crumb a.dz').forEach(a=>a.classList.remove('dz'));const el=document.elementFromPoint(e.clientX,e.clientY),cr=el&&el.closest('#crumb a');let d=null;hot=null;
+ if(cr&&cr.dataset.v!==S.cur&&!pathOf(cr.dataset.v).includes(n.id)){cr.classList.add('dz');d=cr.dataset.v}
+ else for(const o of here())if(o!==n&&Math.hypot(o.x-n.x,o.y-n.y)<o.r*.55){hot=d=o.id;break}
+ drag.drop=d}
+function del(){const n=selN(),e=selE();if(!n&&!e)return;commit();if(n){const k=Object.values(S.nodes).some(m=>m.map===n.id);rm(n.id);if(pend===n.id)pend=null;toast(k?'Deleted bubble and its inner map. Ctrl+Z undoes it.':'Deleted. Ctrl+Z undoes it.',2800)}else delete S.edges[e.id];map().sel=null;refresh();save()}
+const ctr=()=>{const c=cam();return[(innerWidth/2-c.x)/c.k+(Math.random()-.5)*160,(innerHeight/2-c.y)/c.k+(Math.random()-.5)*160]};
+function select(s,f){map().sel=s;render();panel(f);save()}
+function refresh(f){render();panel(f);crumbs()}
+function go(id){const n=S.nodes[id];if(!n)return;$('sr').hidden=true;S.cur=n.map;const M=map();M.sel={t:'n',id};M.cam.x=innerWidth/2-n.x*M.cam.k;M.cam.y=innerHeight/2-n.y*M.cam.k;refresh();save()}
+function wrap(t,r,fs){fs=fs||13;const m=Math.max(4,Math.round(3*r/fs)),X=Math.max(2,Math.floor(1.5*r/(fs*1.2))),L=[];let l='';for(const w of t.split(/\s+/)){if((l+' '+w).trim().length>m&&l){L.push(l);l=w}else l=(l+' '+w).trim()}if(l)L.push(l);if(L.length>X){L.length=X;L[X-1]=L[X-1].slice(0,m-1)+'…'}return L.map(s=>s.length>m+4?s.slice(0,m+3)+'…':s)}
+function render(keep){
+ const M=map(),c=M.cam,N=S.nodes,sn=selN(),se=M.sel&&M.sel.t=='e'?M.sel.id:null,kids={},ext={},rel=new Set(sn?[sn.id]:[]);let es='',ns='';
+ for(const n of Object.values(N))kids[n.map]=(kids[n.map]||0)+1;
+ for(const e of Object.values(S.edges)){
+  const a=N[e.from],b=N[e.to];if(!a||!b)continue;const A=a.map===S.cur,B=b.map===S.cur;
+  if(A&&B){
+   const hot=sn&&(a===sn||b===sn);if(hot){rel.add(a.id);rel.add(b.id)}
+   const dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,sx=a.x+ux*a.r,sy=a.y+uy*a.r,ex=b.x-ux*(b.r+5),ey=b.y-uy*(b.r+5),mx=(sx+ex)/2-uy*L*.12,my=(sy+ey)/2+ux*L*.12,d=`M${sx} ${sy}Q${mx} ${my} ${ex} ${ey}`;
+   es+=`<g data-e="${e.id}" opacity="${sn&&!hot?.3:1}"><path d="${d}" stroke="transparent" stroke-width="14" fill="none"/><path d="${d}" fill="none" stroke="${hot||e.id===se?a.color:'var(--ln)'}" stroke-width="${e.id===se?3:hot?2.2:1.4}" marker-end="url(#ar)"/>${e.label?`<text class="el" x="${(sx+2*mx+ex)/4}" y="${(sy+2*my+ey)/4-4}" text-anchor="middle">${esc(e.label)}</text>`:''}</g>`
+  }else if(A||B){const x=A?a.id:b.id;(ext[x]=ext[x]||[]).push(A?b.id:a.id)}
+ }
+ for(const n of here()){
+  const fs=n.fs||13,lh=fs*1.15,T=n.text?wrap(n.text,n.r,fs):['…'],NL=n.showNote&&n.note?wrap(n.note.replace(/\n/g,' '),n.r*2.4,11).slice(0,2):[],dim=sn&&!rel.has(n.id)?(S.focus?.06:.45):1,s=sn===n,x=ext[n.id];
+  ns+=`<g data-n="${n.id}" transform="translate(${n.x} ${n.y})" opacity="${dim}" style="cursor:pointer${s?`;filter:drop-shadow(0 0 10px ${n.color})`:''}"><circle r="${n.r}" fill="${n.color}" fill-opacity="${n.fo??.16}" stroke="${n.color}" stroke-width="${s?3:1.5}"${pend===n.id?' stroke-dasharray="6 4"':''}/>${hot===n.id?`<circle r="${n.r+14}" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 4"/>`:''}${kids[n.id]?`<circle r="${n.r+6}" fill="none" stroke="${n.color}" stroke-dasharray="2 5" opacity=".7"/><text class="sm" y="${n.r+22}" text-anchor="middle">${kids[n.id]} inside</text>`:''}<text text-anchor="middle" style="font-size:${fs}px"${n.text?'':' opacity=".4"'}>${T.map((t,i)=>`<tspan x="0" dy="${i?lh:fs*.35-(T.length-1)*lh/2}">${esc(t)}</tspan>`).join('')}</text>${NL.length?`<text class="sm" text-anchor="middle" y="${n.r+(kids[n.id]?36:20)}">${NL.map((t,i)=>`<tspan x="0" dy="${i?13:0}">${esc(t)}</tspan>`).join('')}</text>`:''}${n.note&&!n.showNote?`<text class="sm" x="${-n.r*.72}" y="${-n.r*.6}" text-anchor="middle" style="font-size:14px">≡</text>`:''}${x?`<g transform="translate(${n.r*.72} ${-n.r*.72})"><circle r="10" fill="#fbbf24"/><text y="4" text-anchor="middle" style="fill:#111;font-size:10px">↗${x.length}</text></g>`:''}</g>`
+ }
+ g.innerHTML=es+ns;g.setAttribute('transform',`translate(${c.x} ${c.y}) scale(${c.k})`);
+ cv.style.backgroundPosition=`${c.x}px ${c.y}px`;cv.style.backgroundSize=`${32*c.k}px ${32*c.k}px`;$('hint').hidden=Object.keys(N).length>0;mini(keep)
+}
+function mini(keep){const x=mm.getContext('2d'),c=cam(),v=[-c.x/c.k,-c.y/c.k,(innerWidth-c.x)/c.k,(innerHeight-c.y)/c.k],ns=here();let a,b,d,e;
+ if(keep&&mm.m)({a,b,s:mm.s}=mm.m);else{[a,b,d,e]=v;for(const n of ns){a=Math.min(a,n.x-n.r);b=Math.min(b,n.y-n.r);d=Math.max(d,n.x+n.r);e=Math.max(e,n.y+n.r)}mm.s=Math.min(160/(d-a),110/(e-b));mm.m={a,b}}
+ const s=mm.s,P=(X,Y)=>[(X-a)*s,(Y-b)*s];x.clearRect(0,0,160,110);
+ for(const n of ns){const[p,q]=P(n.x,n.y);x.fillStyle=n.color;x.beginPath();x.arc(p,q,Math.max(1.5,n.r*s),0,7);x.fill()}
+ const[p,q]=P(v[0],v[1]);x.strokeStyle='#7c9cff';x.lineWidth=1.5;x.strokeRect(p,q,(v[2]-v[0])*s,(v[3]-v[1])*s)}
+const mv=e=>{if(!(e.buttons&1)||!mm.m)return;const r=mm.getBoundingClientRect(),c=cam();c.x=innerWidth/2-(mm.m.a+(e.clientX-r.left)/mm.s)*c.k;c.y=innerHeight/2-(mm.m.b+(e.clientY-r.top)/mm.s)*c.k;render(1);save()};
+mm.onpointerdown=e=>{mm.setPointerCapture(e.pointerId);mv(e)};mm.onpointermove=mv;
+function crumbs(){$('crumb').innerHTML='<a data-a="nav" data-v="root">Home</a>'+pathOf(S.cur).map(i=>` › <a data-a="nav" data-v="${i}">${nm(S.nodes[i])}</a>`).join('')}
+function panel(f){const n=selN(),e=selE(),sd=$('side');
+ if(!n&&!e){sd.hidden=true;return}sd.hidden=false;
+ if(e){const a=S.nodes[e.from],b=S.nodes[e.to];sd.innerHTML=`<p class="m"><a data-a="go" data-v="${a.id}">${nm(a)}</a> → <a data-a="go" data-v="${b.id}">${nm(b)}</a></p><input id="el" list="rl" placeholder="How are they related? (causes, leads to…)" value="${esc(e.label)}"><datalist id="rl"><option>causes<option>contradicts<option>reminds me of<option>leads to<option>is an example of</datalist><div class="r"><button data-a="rev">Reverse</button><button data-a="del">Delete link</button></div>`;if(f)$('el').focus();return}
+ const k=Object.values(S.nodes).filter(m=>m.map===n.id).length,ls=Object.values(S.edges).filter(x=>x.from===n.id||x.to===n.id).map(x=>{const o=S.nodes[x.from===n.id?x.to:x.from];return o?`<div class="it" style="display:flex;gap:6px"><a data-a="go" data-v="${o.id}" style="flex:1">${x.from===n.id?'→':'←'} ${esc(x.label)||'…'} · ${nm(o)}<small>${['Home',...pathOf(o.map).map(i=>S.nodes[i].text||'untitled')].map(esc).join(' › ')}</small></a><button data-a="esel" data-v="${x.id}">Edit</button></div>`:''}).join('');
+ sd.innerHTML=`<input id="pt" placeholder="Half-formed thought…" value="${esc(n.text)}"><textarea id="pn" rows="5" placeholder="Longer notes…">${esc(n.note)}</textarea><div class="r"><button data-a="notes">Full note editor</button></div><label class="ck"><input type="checkbox" id="sn"${n.showNote?' checked':''}> Show note under bubble</label><input id="pg" placeholder="tags, comma separated" value="${esc(n.tags)}"><div class="sw">${PAL.map(c=>`<i data-a="col" data-v="${c}" style="background:${c}"></i>`).join('')}<input type="color" id="cc" value="${n.color}" title="Custom color"></div>${[['rs','Bubble size',n.r,20,170],['fs','Text size',n.fs||13,9,30],['fo','Fill strength',Math.round((n.fo??.16)*100),0,70]].map(([i,l,v,a,b])=>`<div class="lb"><span>${l}</span><span>${v}</span></div><input type="range" id="${i}" min="${a}" max="${b}" value="${v}">`).join('')}<div class="r"><button data-a="open">Open map (${k})</button><button data-a="conn">Link to…</button></div><div class="r"><button data-a="dup">Duplicate</button><button data-a="del">Delete</button></div><div class="r"><button data-a="up" title="U">Up a layer</button><button data-a="moveto" title="M">Move into…</button></div><div class="r"><button data-a="wrapone" title="Make a new parent bubble around this one">Wrap in new layer</button></div>${ls?`<p class="m">Connections (also across maps)</p>${ls}`:''}`;
+ if(f){$('pt').focus();$('pt').select()}}
+$('side').oninput=e=>{const n=selN(),ed=selE(),t=e.target.id,v=e.target.value;if(n){if(t=='pt')n.text=v;if(t=='pn')n.note=v;if(t=='pg')n.tags=v;if(t=='rs')n.r=+v;if(t=='fs')n.fs=+v;if(t=='fo')n.fo=v/100;if(t=='cc')n.color=v;if(t=='sn')n.showNote=e.target.checked;const lb=e.target.previousElementSibling;if(lb&&lb.className=='lb')lb.lastElementChild.textContent=v}if(ed&&t=='el')ed.label=v;render();save()};
+$('side').onfocusin=commit;
+function act(a,v){const n=selN(),e=selE();
+ if(a=='nav'){S.cur=v;refresh();save()}
+ else if(a=='open'&&n){S.cur=n.id;refresh();save()}
+ else if(a=='go')go(v);
+ else if(a=='esel')select({t:'e',id:v},1);
+ else if(a=='conn'&&n){pend=n.id;toast(`Linking from “${n.text||'untitled'}”. Click any bubble, in this map or another. Esc cancels.`,0);render()}
+ else if(a=='dup'&&n){commit();const m=mk(n.text,n.x+40,n.y+40,n.color);m.note=n.note;m.tags=n.tags;m.r=n.r;select({t:'n',id:m.id})}
+ else if(a=='del')del();else if(a=='notes'&&n){$('ne').hidden=false;$('nt').textContent=n.text||'untitled';$('nb').value=n.note;$('nc').textContent=wc(n.note);$('nb').focus()}else if(a=='closeN'){$('ne').hidden=true;panel()}else if(a=='up'&&n){const o=S.nodes[S.cur];if(o)moveNode(n.id,o.map);else toast('Already on the top layer. Use Layer above to add one.',2500)}else if(a=='moveto'&&n)openSearch(n.id);else if(a=='mv'){if(mvId)moveNode(mvId,v);$('sr').hidden=true}else if(a=='wrapone'&&n)wrapNodes([n]);else if(a=='wrapall')wrapNodes(here());
+ else if(a=='col'&&n){commit();n.color=v;render();save()}
+ else if(a=='size'&&n){commit();n.r=+v;render();save()}
+ else if(a=='rev'&&e){commit();[e.from,e.to]=[e.to,e.from];refresh();save()}
+ else if(a=='search')openSearch(null);
+ else if(a=='rand'){const k=Object.keys(S.nodes);if(k.length)go(k[Math.random()*k.length|0])}
+ else if(a=='focus'){S.focus=S.focus?0:1;toast(S.focus?'Focus on: unrelated bubbles hidden while one is selected':'Focus off',1800);render();save()}
+ else if(a=='theme'){S.theme=S.theme=='dark'?'light':'dark';document.documentElement.dataset.t=S.theme;save()}
+ else if(a=='undo')undo();else if(a=='redo')redo();
+ else if(a=='data'){$('dj').value=JSON.stringify(S,null,1);$('dt').hidden=false}
+ else if(a=='closeD')$('dt').hidden=true;else if(a=='savef')saveFile();else if(a=='merge'){try{const o=JSON.parse($('dj').value);if(!o||typeof o.nodes!='object'||typeof o.edges!='object')throw 0;commit();const nn=Object.keys(o.nodes).filter(k=>!S.nodes[k]).length;Object.assign(S.nodes,o.nodes);Object.assign(S.edges,o.edges);for(const k in o.maps||{})if(!S.maps[k])S.maps[k]=o.maps[k];$('dt').hidden=true;refresh();flush();toast(`Merged: ${nn} new bubbles added. Ctrl+Z undoes it.`,4500)}catch(x){toast('That is not a valid Mindscape file. Nothing changed.',3500)}}
+ else if(a=='copy'){$('dj').select();document.execCommand('copy');toast('Copied',1500)}
+ else if(a=='load'){try{const o=JSON.parse($('dj').value);if(!o||typeof o.nodes!='object'||typeof o.edges!='object')throw 0;try{localStorage.setItem(K+'.bak',JSON.stringify(S))}catch(x){}S=Object.assign(fresh(),fix(o));H=[];R=[];pend=null;document.documentElement.dataset.t=S.theme;$('dt').hidden=true;refresh();flush();toast('Imported. Previous data kept as a backup.',3000)}catch(x){toast('That JSON is not a valid Mindscape export. Nothing changed.',3500)}}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)act(b.dataset.a,b.dataset.v)});
+cv.onpointerdown=e=>{cv.setPointerCapture(e.pointerId);
+ const nEl=e.target.closest('[data-n]'),eEl=e.target.closest('[data-e]'),id=nEl?nEl.dataset.n:null,c=cam(),now=Date.now(),
+  dbl=now-last.t<350&&last.id===id&&Math.hypot(e.clientX-last.x,e.clientY-last.y)<8;last={t:now,id,x:e.clientX,y:e.clientY};
+ if(id){const cur=selN();
+  if(pend&&pend!==id){const l=link(pend,id);pend=null;toast('');if(l){select({t:'e',id:l.id},1)}return}
+  if(e.shiftKey&&cur&&cur.id!==id){const l=link(cur.id,id);select({t:'e',id:l.id},1);return}
+  if(dbl){select({t:'n',id},1);return}
+  select({t:'n',id});const n=S.nodes[id];drag={t:'n',id,sx:e.clientX,sy:e.clientY,ox:n.x,oy:n.y,m:0}
+ }else if(eEl){select({t:'e',id:eEl.dataset.e});drag=null}
+ else if(dbl){commit();const n=mk('',(e.clientX-c.x)/c.k,(e.clientY-c.y)/c.k);select({t:'n',id:n.id},1);drag=null}
+ else{select(null);drag={t:'p',sx:e.clientX,sy:e.clientY,ox:c.x,oy:c.y}}};
+cv.onpointermove=e=>{if(!drag)return;const c=cam(),dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
+ if(drag.t=='p'){c.x=drag.ox+dx;c.y=drag.oy+dy}else{if(!drag.m&&Math.hypot(dx,dy)>3){drag.m=1;commit();toast('Drop on a bubble to move it inside · drop on the breadcrumb to move it up a layer',0)}if(drag.m){const n=S.nodes[drag.id];n.x=drag.ox+dx/c.k;n.y=drag.oy+dy/c.k;dropCheck(e,n)}}
+ render();save()};
+const up=ok=>{const d=drag;drag=null;hot=null;if(d&&d.t=='n'&&d.m){toast('');document.querySelectorAll('#crumb a.dz').forEach(a=>a.classList.remove('dz'));if(ok&&d.drop)moveNode(d.id,d.drop,1);else render()}};
+cv.onpointerup=()=>up(1);cv.onpointercancel=()=>up(0);
+cv.addEventListener('wheel',e=>{e.preventDefault();const c=cam(),k=Math.min(6,Math.max(.05,c.k*Math.exp(-e.deltaY*(e.ctrlKey?.01:.0015))));c.x=e.clientX-(e.clientX-c.x)*k/c.k;c.y=e.clientY-(e.clientY-c.y)*k/c.k;c.k=k;render();save()},{passive:false});
+$('qa').onkeydown=e=>{if(e.key!='Enter')return;const t=e.target.value.trim();if(!t)return;const p=selN();commit();let n;if(e.shiftKey&&p)n=child(p,t);else{const[x,y]=ctr();n=mk(t,x,y)}e.target.value='';select({t:'n',id:n.id})};
+function openSearch(mv){mvId=mv;$('sq').placeholder=mv?'Move into which bubble? Type to search.':'Search every bubble in every map…';$('sr').hidden=false;$('sq').value='';srch();$('sq').focus()}
+function srch(){const q=$('sq').value.trim().toLowerCase(),r=Object.values(S.nodes).filter(n=>(!q||(n.text+' '+n.note+' '+n.tags).toLowerCase().includes(q))&&(!mvId||!pathOf(n.id).includes(mvId))).slice(0,40);
+ $('sl').innerHTML=(mvId&&!q?'<div class="it" data-a="mv" data-v="root"><b>Home</b><small>Top layer</small></div>':'')+r.map(n=>`<div class="it" data-a="${mvId?'mv':'go'}" data-v="${n.id}"><b>${nm(n)}</b><small>${['Home',...pathOf(n.map).map(i=>S.nodes[i].text||'untitled')].map(esc).join(' › ')}${n.tags?' · #'+esc(n.tags):''}</small></div>`).join('')||'<p class="m">No matches</p>'}
+$('sq').oninput=srch;$('sq').onkeydown=e=>{if(e.key=='Enter'){const f=$('sl').firstElementChild;if(f&&f.dataset.v)act(f.dataset.a,f.dataset.v)}};
+$('sr').onclick=e=>{if(e.target.id=='sr')e.target.hidden=true};$('ne').onclick=e=>{if(e.target.id=='ne')act('closeN')};$('nb').onfocus=commit;$('nb').oninput=e=>{const n=selN();if(n){n.note=e.target.value;$('nc').textContent=wc(n.note);render();save()}};$('dt').onclick=e=>{if(e.target.id=='dt')e.target.hidden=true};
+addEventListener('keydown',e=>{const t=e.target,typing=/INPUT|TEXTAREA/.test(t.tagName),k=e.key.toLowerCase(),m=e.ctrlKey||e.metaKey;
+ if(m&&k=='k'){e.preventDefault();act('search');return}if(m&&k=='s'){e.preventDefault();saveFile();return}
+ if(k=='escape'){if(!$('ne').hidden)act('closeN');else if(!$('sr').hidden||!$('dt').hidden)$('sr').hidden=$('dt').hidden=true;else if(pend){pend=null;toast('');render()}else{document.activeElement.blur();select(null)}return}
+ if(typing){if(k=='enter'&&t.tagName=='INPUT'&&t.id!='qa'&&t.id!='sq')t.blur();return}
+ if(m&&k=='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(m&&k=='y'){e.preventDefault();redo();return}
+ if(m)return;const n=selN();
+ if(k=='n'){e.preventDefault();commit();const[x,y]=ctr();select({t:'n',id:mk('',x,y).id},1)}
+ else if(k=='tab'&&n){e.preventDefault();commit();select({t:'n',id:child(n,'').id},1)}
+ else if(k=='enter')act('open');
+ else if(k=='backspace'||(e.altKey&&k=='arrowleft')){const p=S.nodes[S.cur];if(p){S.cur=p.map;refresh();save()}}
+ else if(k=='delete')del();else if(k=='c')act('conn');else if(k=='d')act('dup');else if(k=='u')act('up');else if(k=='m')act('moveto');else if(k=='l')act('wrapall');
+ else if(k=='f')act('focus');else if(k=='t')act('theme');else if(k=='r')act('rand');
+ else if(k=='/'){e.preventDefault();$('qa').focus()}});
+addEventListener('resize',()=>render());
+async function saveFile(){try{const dl=window.claude?await claude.use('downloads'):null;if(!dl){toast('File saving is not available here. Use Copy instead.',3500);return}await dl.save({filename:'mindscape-'+new Date().toISOString().slice(0,10)+'.json',data:JSON.stringify(S)});toast('Saved. On your other device: Data, Open file, then Merge or Replace.',5000)}catch(e){if(!e||e.code!='declined')toast('Could not save a file. Use Copy instead.',3500)}}
+$('fi').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('dj').value=r.result;toast('File loaded into the box. Choose Merge or Replace.',4500)};r.readAsText(f);e.target.value=''};
+document.documentElement.dataset.t=S.theme||'dark';refresh();
+</script></body></html>
